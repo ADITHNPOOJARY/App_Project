@@ -1,0 +1,277 @@
+openapi: 3.0.3
+info:
+  title: Trekking Management System API
+  description: API and routing endpoints for Trekking Management System.
+  version: 1.0.0
+paths:
+  /signup:
+    get:
+      summary: Render Registration Page
+      responses:
+        '200':
+          description: Signup HTML form rendered.
+    post:
+      summary: Register User or Staff
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                firstname:
+                  type: string
+                lastname:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                role:
+                  type: string
+                  enum: [user, staff]
+              required: [firstname, lastname, email, password, role]
+      responses:
+        '302':
+          description: Registration successful, redirected to sign-in.
+
+  /signin:
+    get:
+      summary: Render Sign-in Page
+      responses:
+        '200':
+          description: Login HTML form rendered.
+    post:
+      summary: Authenticate User / Staff
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required: [email, password]
+      responses:
+        '302':
+          description: Session created, redirected to respective dashboard.
+
+  /admin/dashboard:
+    get:
+      summary: Admin Dashboard Overview
+      responses:
+        '200':
+          description: Metrics for users, staff, bookings, and treks.
+
+  /admin/treks:
+    get:
+      summary: List All Treks
+      responses:
+        '200':
+          description: Table of all treks with assigned guide IDs.
+
+  /admin/add_trek:
+    post:
+      summary: Create New Trek
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                trek_name:
+                  type: string
+                location:
+                  type: string
+                duration:
+                  type: integer
+                slots:
+                  type: integer
+                start_date:
+                  type: string
+                  format: date
+                end_date:
+                  type: string
+                  format: date
+                description:
+                  type: string
+              required: [trek_name, location, duration, slots, start_date, end_date]
+      responses:
+        '302':
+          description: Trek created, redirected to treks list.
+
+  /admin/staff:
+    get:
+      summary: View Staff Management Tables
+      responses:
+        '200':
+          description: Pending, approved, and blacklisted staff lists.
+
+  /admin/staff/action/{staff_id}/{action}:
+    post:
+      summary: Approve or Reject Staff
+      parameters:
+        - name: staff_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: action
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [approve, reject]
+      responses:
+        '302':
+          description: Status updated, redirected to staff page.
+
+  /admin/staff/assign:
+    post:
+      summary: Assign Staff Guide to Trek
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                staff_email:
+                  type: string
+                trek_id:
+                  type: integer
+              required: [staff_email, trek_id]
+      responses:
+        '302':
+          description: Staff assigned, redirected to staff page.
+
+  /admin/users:
+    get:
+      summary: View Registered Users
+      responses:
+        '200':
+          description: User table sorted by total bookings.
+
+  /staff/dashboard:
+    get:
+      summary: Staff Dashboard
+      responses:
+        '200':
+          description: Treks assigned to current staff guide.
+
+  /staff/manage/{trek_id}:
+    get:
+      summary: Trek Roster Management
+      parameters:
+        - name: trek_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Trek details and participant list rendered.
+
+  /staff/profile:
+    get:
+      summary: View Staff Profile
+      responses:
+        '200':
+          description: Staff profile form.
+    post:
+      summary: Update Staff Profile
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Staff profile updated.
+
+  /user/dashboard:
+    get:
+      summary: User Dashboard
+      responses:
+        '200':
+          description: User reservations and active bookings.
+
+  /user/browse:
+    get:
+      summary: Browse Available Treks
+      responses:
+        '200':
+          description: Available trek cards with assigned staff.
+
+  /user/book_trek:
+    post:
+      summary: Book a Trek Slot
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                trek_id:
+                  type: integer
+              required: [trek_id]
+      responses:
+        '302':
+          description: Slot reserved, redirected to user dashboard.
+
+  /user/history:
+    get:
+      summary: View User Booking History
+      responses:
+        '200':
+          description: Table of previous bookings.
+
+  /user/profile:
+    get:
+      summary: View User Profile
+      responses:
+        '200':
+          description: User profile form.
+    post:
+      summary: Update User Profile
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: User profile updated.
+
+  /logout:
+    get:
+      summary: User / Staff Logout
+      responses:
+        '302':
+          description: Session cleared, redirected to login.

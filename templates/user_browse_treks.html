@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Browse Treks</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .sidebar { width: 240px; min-height: 100vh; background-color: #f8f9fa; }
+        .nav-link { color: #4b5563; font-weight: 500; margin-bottom: 5px; }
+        .nav-link:hover { background-color: #e9ecef; }
+        .nav-link.active { background-color: #eff6ff !important; color: #0d6efd !important; font-weight: 600; }
+        .detail-label { font-weight: 600; color: #4b5563; width: 140px; }
+    </style>
+</head>
+<body>
+
+<div class="d-flex">
+    <div class="sidebar d-flex flex-column flex-shrink-0 p-3 border-end">
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li><a href="{{ url_for('user_dashboard') }}" class="nav-link d-flex align-items-center gap-3"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li><a href="{{ url_for('browse_treks') }}" class="nav-link active d-flex align-items-center gap-3"><i class="bi bi-binoculars"></i> Browse Treks</a></li>
+            <li><a href="{{ url_for('user_history') }}" class="nav-link d-flex align-items-center gap-3"><i class="bi bi-clock-history"></i> History</a></li>
+            <li><a href="{{ url_for('user_profile') }}" class="nav-link d-flex align-items-center gap-3"><i class="bi bi-person"></i> Profile</a></li>
+        </ul>
+        <hr>
+        <div class="logout-section">
+            <a href="{{ url_for('signin') }}" class="nav-link d-flex align-items-center gap-3"><i class="bi bi-box-arrow-right"></i> Logout</a>
+        </div>
+    </div>
+
+    <div class="flex-grow-1 p-5 bg-white">
+        
+        {% if trek %}
+            <h2 class="fw-bold mb-5">{{ trek[1] }}</h2> <!-- Trek Name -->
+
+            <div class="row">
+                <div class="col-md-7 border-start border-4 border-light ps-4">
+                    <div class="d-flex mb-3">
+                        <div class="detail-label">Location</div>
+                        <div>{{ trek[2] }}</div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="detail-label">Duration</div>
+                        <div>{{ trek[3] }} Days</div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="detail-label">Start Date</div>
+                        <div>{{ trek[4] }}</div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="detail-label">End Date</div>
+                        <div>{{ trek[5] }}</div>
+                    </div>
+                    <div class="d-flex mb-4">
+                        <div class="detail-label">Available Slots</div>
+                        <div>{{ trek[6] }}</div>
+                    </div>
+                    
+                    <p class="text-muted mt-5" style="line-height: 1.6;">
+                        {{ trek[7] }}
+                    </p>
+                </div>
+                <div class="col-md-5">
+                    <div class="card shadow-sm border-0 bg-light p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-person-badge me-2"></i>Assigned Staff</h5>
+                        
+                        {% if staff_list %}
+                            {% for staff in staff_list %}
+                            <div class="mb-3 p-3 bg-white rounded border">
+                                <div class="fw-bold text-primary">{{ staff[1] }} {{ staff[2] }}</div>
+                                <div class="text-muted small mb-1"><i class="bi bi-envelope me-1"></i> {{ staff[3] }}</div>
+                                <div class="text-muted small"><i class="bi bi-hash me-1"></i> Staff ID: S{{ "%03d" | format(staff[0]) }}</div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-warning mb-0 border-0">
+                                <i class="bi bi-info-circle me-2"></i> Staff will be assigned soon!
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-3 mt-5 border-top pt-4">
+                <form action="{{ url_for('book_trek') }}" method="POST">
+                    <input type="hidden" name="trek_id" value="{{ trek[0] }}">
+                    <button type="submit" class="btn btn-primary px-4 fw-medium">Book Now</button>
+                </form>
+
+                {% if has_next %}
+                    <a href="{{ url_for('browse_treks', index=next_index) }}" class="btn btn-outline-secondary px-4 fw-medium">Next Trek <i class="bi bi-arrow-right"></i></a>
+                {% endif %}
+            </div>
+
+        {% else %}
+            <div class="text-center mt-5">
+                <h3 class="text-muted">No Treks Available</h3>
+                <p>Check back later for new adventures!</p>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+</body>
+</html>
